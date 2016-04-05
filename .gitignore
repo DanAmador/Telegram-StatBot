@@ -79,7 +79,7 @@ crashlytics-build.properties
 /deps
 /doc
 /tmp
-/node_modules
+fagbot/node_modules
 
 /installer/_build
 /installer/tmp
