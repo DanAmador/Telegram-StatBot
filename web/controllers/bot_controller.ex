@@ -1,7 +1,11 @@
 defmodule Fagbot.BotController do
   use Fagbot.Web, :controller
+  use Ecto.Repo,
+    otp_app: :my_app,
+    adapter: Mongo.Ecto
 
   alias Fagbot.Bot
+
 
 	def get_me(conn, _params) do
 	  case Nadia.get_me do
@@ -29,8 +33,8 @@ defmodule Fagbot.BotController do
 	  case Nadia.get_updates  do
 	    {:ok, results} ->
 	    #TODO Store newest updates to mongo
-
-	    results
+	    results |> clean_nulls
+	    #TODO clean nulls from updates
 	  end
 	end
 

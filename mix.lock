@@ -12,6 +12,8 @@
   "idna": {:hex, :idna, "1.2.0"},
   "metrics": {:hex, :metrics, "1.0.1"},
   "mimerl": {:hex, :mimerl, "1.0.2"},
+  "mongodb": {:hex, :mongodb, "0.1.1"},
+  "mongodb_ecto": {:hex, :mongodb_ecto, "0.1.2"},
   "nadia": {:hex, :nadia, "0.4.0"},
   "phoenix": {:hex, :phoenix, "1.1.4"},
   "phoenix_ecto": {:hex, :phoenix_ecto, "2.0.1"},
