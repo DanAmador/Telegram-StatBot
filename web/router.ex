@@ -24,6 +24,8 @@ defmodule Fagbot.Router do
 
      pipe_through :api
      get "/me", BotController, :get_me
-
+	 post "/message", BotController, :send_message
+	 get "/message", BotController, :get_messages
+	 get "/updates", BotController, :show_updates
    end
 end
