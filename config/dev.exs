@@ -32,11 +32,8 @@ config :logger, :console, format: "[$level] $message\n"
 # and calculating stacktraces is usually expensive.
 config :phoenix, :stacktrace_depth, 20
 
-# Configure your database
+
 config :fagbot, Fagbot.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "fagbot_dev",
-  hostname: "localhost",
-  pool_size: 10
+  adapter: Ecto.Adapters.Mongo,
+  database: "fagDocs",
+  hostname: "localhost"

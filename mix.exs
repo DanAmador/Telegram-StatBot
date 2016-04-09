@@ -19,7 +19,8 @@ defmodule Fagbot.Mixfile do
   def application do
     [mod: {Fagbot, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex,:nadia,:mongodb_ecto, :ecto]]
+                    :phoenix_ecto, :postgrex,:nadia,:mongodb_ecto, :ecto,
+                    :calendar]]
   end
 
   # Specifies which paths to compile per environment.
@@ -38,7 +39,8 @@ defmodule Fagbot.Mixfile do
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
      {:nadia, "~> 0.3"},
-     {:mongodb_ecto, "~> 0.1"}]
+     {:mongodb_ecto, "~> 0.1"},
+     {:calendar, "~> 0.14.0"}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.

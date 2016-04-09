@@ -1,9 +1,6 @@
 defmodule Fagbot.BotController do
   use Fagbot.Web, :controller
-  use Ecto.Repo,
-    otp_app: :my_app,
-    adapter: Mongo.Ecto
-
+  alias Messages
   alias Fagbot.Bot
 
 
@@ -32,14 +29,28 @@ defmodule Fagbot.BotController do
 	def storeUpdates do
 	  case Nadia.get_updates  do
 	    {:ok, results} ->
+
 	    #TODO Store newest updates to mongo
-	    results |> clean_nulls
+	    results # |> clean_nulls
 	    #TODO clean nulls from updates
 	  end
+	end
+
+	def test(conn, _) do
+
+		user_params = [chat_id: "asdasd", chat_name: "test",
+		participants: [%{"hola" => "fuck"}], total_messages: 10, total_stickers: 10, date_created: Messages.get_date]
+		changeset = Messages.changeset(%Messages{}, user_params)
+		case Repo.insert(changeset)do
+		   {:ok, values }->
+		    text conn, :ok
+		end
 	end
 
 	def show_updates(conn,_) do
 
 	  json conn, storeUpdates
 	end
+
+
 end
