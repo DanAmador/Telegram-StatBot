@@ -27,6 +27,5 @@ defmodule Fagbot.Router do
 	 post "/message", BotController, :send_message
 	 get "/message", BotController, :get_messages
 	 get "/updates", BotController, :show_updates
-	 get "/test", BotController, :test
    end
 end
