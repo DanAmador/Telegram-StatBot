@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
-
 import json
-import dbHelper
+import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+from dbHelper import dbHelper
 
 db = dbHelper()
-
-def test(bot, update):
-    bot.sendMessage()
-
-
 def learn(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text="aww yiss")
 
 
 def updates(bot, update):
-    bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
+    dbHelper.messageInsert(db,update)
+    # bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
 
 
 def initialize():
+    logging.basicConfig(level=logging.DEBUG)
     with open('settings.json') as settings:
         data = json.load(settings)
         updater = Updater(token=data["telegram_token"])
@@ -29,7 +26,9 @@ def initialize():
     dispatcher.add_handler(CommandHandler('learn', learn))
     dispatcher.add_handler(MessageHandler([Filters.text], updates))
 
-    print("shit's working,yo %s") % data['telegram_token']
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.debug("shit's working,yo %s" % data['telegram_token'])
     updater.start_polling()
 
 
