@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import json
+import dbHelper
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+
+db = dbHelper()
 
 def test(bot, update):
     bot.sendMessage()
