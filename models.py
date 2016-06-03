@@ -1,10 +1,9 @@
-from sqlalchemy import Column, ForeignKey, String, Integer, Date
+from sqlalchemy import Column, ForeignKey, String, Integer, Date, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-# TODO update join conditions in relationships
 class Messages(Base):
     __tablename__ = 'messages'
     id = Column(Integer, primary_key=True)
@@ -20,9 +19,10 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(30), nullable=False)
     last_name = Column(String(30), nullable=True)
-    date = Column(Date)
 
-    chatIds = Column(Integer, ForeignKey('chats.id'))
+    # chatIds = Column(Integer, ForeignKey('chats.id'))
+
+
 
 
 class Chats(Base):
@@ -32,5 +32,4 @@ class Chats(Base):
     title = Column(String(40), nullable=False)
     date = Column(Date)
 
-    user = relationship(Users)
     messages = relationship(Messages)

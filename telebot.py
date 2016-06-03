@@ -12,7 +12,7 @@ def learn(bot, update):
 
 
 def updates(bot, update):
-    dbHelper.messageInsert(db,update)
+    db.messageInsert(update)
     # bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
 
 
