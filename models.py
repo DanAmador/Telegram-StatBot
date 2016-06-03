@@ -9,9 +9,10 @@ class Messages(Base):
     __tablename__ = 'messages'
     id = Column(Integer, primary_key=True)
     text = Column(String(4096), nullable=False)
-    user = Column(Integer, ForeignKey('users.id'))
-    chat = Column(Integer, ForeignKey('chats.id'))
     date = Column(Date)
+
+    sender = Column(Integer, ForeignKey('users.id'))
+    chatId = Column(Integer, ForeignKey('chats.id'))
 
 
 class Users(Base):
@@ -21,6 +22,8 @@ class Users(Base):
     last_name = Column(String(30), nullable=True)
     date = Column(Date)
 
+    chatIds = Column(Integer, ForeignKey('chats.id'))
+
 
 class Chats(Base):
     __tablename__ = 'chats'
@@ -28,7 +31,6 @@ class Chats(Base):
     type = Column(String(40), nullable=True)
     title = Column(String(40), nullable=False)
     date = Column(Date)
+
     user = relationship(Users)
     messages = relationship(Messages)
-    messagesId = Column(Integer, ForeignKey('messages.id'))
-    userIds = Column(Integer, ForeignKey('users.id'))
