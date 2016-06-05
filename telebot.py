@@ -2,7 +2,7 @@
 import json
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
 
 from dbHelper import dbHelper
 
@@ -13,7 +13,13 @@ def learn(bot, update):
 
 def updates(bot, update):
     db.messageInsert(update)
-    # bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
+
+
+def count(bot, update,args):
+    print(args)
+    results = "Este pendejo ha mandado %s mensajes en este chat " % db.count(update,args)
+    bot.sendMessage(chat_id=update.message.chat_id, text=results)
+
 
 
 def initialize():
@@ -25,11 +31,15 @@ def initialize():
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('learn', learn))
     dispatcher.add_handler(MessageHandler([Filters.text], updates))
+    dispatcher.add_handler(CommandHandler('chatstats',count,pass_args=True))
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     logger.debug("shit's working,yo %s" % data['telegram_token'])
+
     updater.start_polling()
+    updater.idle()
+
 
 
 if __name__ == '__main__':

@@ -9,9 +9,11 @@ class Messages(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String(4096), nullable=False)
     date = Column(Date)
+    updateId = Column(String(16), nullable=False)
 
     sender = Column(Integer, ForeignKey('users.id'))
     chatId = Column(Integer, ForeignKey('chats.id'))
+
 
 
 class Users(Base):
