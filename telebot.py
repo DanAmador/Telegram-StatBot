@@ -21,6 +21,13 @@ def count(bot, update,args):
     bot.sendMessage(chat_id=update.message.chat_id, text=results)
 
 
+def overall(bot,update):
+    stats = db.minMaxStats(update)
+    stats_string = json.dumps(stats)
+    print(stats_string)
+    bot.sendMessage(chat_id=update.message.chat_id, text=stats_string)
+
+
 
 def initialize():
     logging.basicConfig(level=logging.DEBUG)
@@ -30,8 +37,9 @@ def initialize():
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('learn', learn))
-    dispatcher.add_handler(MessageHandler([Filters.text], updates))
     dispatcher.add_handler(CommandHandler('chatstats',count,pass_args=True))
+    dispatcher.add_handler(CommandHandler('overall', overall))
+    dispatcher.add_handler(MessageHandler([Filters.text], updates))
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)

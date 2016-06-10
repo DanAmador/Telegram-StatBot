@@ -23,4 +23,4 @@ class Chats(Document):
     type = StringField(max_length=30, required=True)
     title = StringField(max_length=40, required=True)
     date = DateTimeField()
-    users = ListField(IntField)
+    users = ListField(IntField())
