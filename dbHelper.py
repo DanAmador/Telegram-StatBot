@@ -28,7 +28,6 @@ class dbHelper(object):
 
     def createChat(self, update):
         q = Chats.objects(chat_id__exists=update.message.chat_id)
-        print(q)
         if (len(q) == 0):
             new_chat = Chats(
                     chat_id=update.message.chat_id,
@@ -39,25 +38,31 @@ class dbHelper(object):
             new_chat.save()
 
     def createUser(self, update):
-        q = Users.objects(user_id=update.message.from_user.id)
+        q = Users.objects(id=update.message.from_user.id)
         if len(q) == 0:
             new_user = Users(
-                    user_id=update.message.from_user.id,
+                    id=update.message.from_user.id,
                     first_name=update.message.from_user.first_name,
                     last_name=update.message.from_user.last_name,
                     username=update.message.from_user.username,
-                    chats = [update.message.chat_id]
+                    chats=[update.message.chat_id]
             )
             new_user.save()
 
     def count(self, update, args):
-        userSearch = Users.objects(first_name__iexact=args,chats__contains=update.message.chat_id).only('user_id').first() # if len(args) > 0 else update.message.from_user.id
-        print("\n fuck \n fuck")
-        print(userSearch)
-        print (''.join(userSearch))
-        # messagesQ = Messages.objects()
-        # count = len(messagesQ)
-        # words = 0
-        # for message in q:
-        #   words += len(message.text.split())
-        return ("fuck", "fuck", "fuck")
+        if args[0] == 'all':
+            messages = Messages.objects(from_chat=update.message.chat.id)
+            username = update.message.chat.title
+        else:
+            userSearch = Users.objects(first_name__iexact=' '.join(args), chats__contains=update.message.chat_id).only(
+                'id','username','first_name').first()   if len(args) > 0 else update.message.from_user
+            username = userSearch.username if userSearch.username else userSearch.first_name
+            messages = Messages.objects(from_user=userSearch.id).only('text')
+
+        return (username, len(messages), self.countWords(messages))
+
+    def countWords(self,messages):
+        totalWords = 0
+        for message in messages:
+            totalWords += len(message.text.split())
+        return totalWords

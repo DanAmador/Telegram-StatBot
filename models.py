@@ -11,7 +11,7 @@ class Messages(Document):
 
 
 class Users(Document):
-    user_id = IntField(primary_key=True, required=True)
+    id = IntField(primary_key=True, required=True)
     first_name = StringField(max_length=30, required=True)
     last_name = StringField(max_length=30)
     username = StringField(max_length=30)
