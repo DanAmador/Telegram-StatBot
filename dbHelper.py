@@ -55,7 +55,13 @@ class dbHelper(object):
             self.session.commit()
 
     def count(self, update,args):
+        logging.log(0, args)
         #TODO Define search optiosn and add more detail like message length
+        username = "hola"
         customId = update.message.from_user.id
-        q = self.session.query(Messages).filter_by(chatId=update.message.chat_id,sender=customId).count()
-        return q
+        q = self.session.query(Messages).filter_by(chatId=update.message.chat_id,sender=customId)
+        count = q.count()
+        words = 0
+        for message in q:
+            words += len(message.text.split())
+        return (username, count, words)

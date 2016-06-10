@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import json
 import logging
-
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
-
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from dbHelper import dbHelper
+
 
 db = dbHelper()
 def learn(bot, update):
@@ -17,7 +16,8 @@ def updates(bot, update):
 
 def count(bot, update,args):
     print(args)
-    results = "Este pendejo ha mandado %s mensajes en este chat " % db.count(update,args)
+    username,messages, words = db.count(update,args)
+    results = "%s has sent  %s messages in this chat with a total of %s words" % (username,messages, words)
     bot.sendMessage(chat_id=update.message.chat_id, text=results)
 
 
