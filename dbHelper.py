@@ -36,6 +36,9 @@ class dbHelper(object):
                     date=update.message.date
             )
             new_chat.save()
+        else:
+            q.update(add_to_set__users=update.message.from_user.id)
+
 
     def createUser(self, update):
         q = Users.objects(id=update.message.from_user.id)
@@ -48,6 +51,9 @@ class dbHelper(object):
                     chats=[update.message.chat_id]
             )
             new_user.save()
+        else:
+            q.update(add_to_set__chats=update.message.chat_id)
+
 
     def count(self, update, args):
         if args[0] == 'all':
@@ -59,7 +65,7 @@ class dbHelper(object):
             username = userSearch.username if userSearch.username else userSearch.first_name
             messages = Messages.objects(from_user=userSearch.id).only('text')
 
-        return (username, len(messages), self.countWords(messages))
+        return username, len(messages), self.countWords(messages)
 
     def countWords(self,messages):
         totalWords = 0
