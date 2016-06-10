@@ -15,7 +15,6 @@ def updates(bot, update):
 
 
 def count(bot, update,args):
-    print(args)
     username,messages, words = db.count(update,args)
     results = "%s has sent  %s messages in this chat with a total of %s words" % (username,messages, words)
     bot.sendMessage(chat_id=update.message.chat_id, text=results)

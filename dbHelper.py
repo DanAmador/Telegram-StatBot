@@ -1,19 +1,15 @@
 import logging
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from mongoengine import connect
 
-from models import Messages, Base, Chats, Users
+from models import Messages, Chats, Users
 
 
 class dbHelper(object):
     def __init__(self):
-        self.engine = create_engine('sqlite:///telebot.db')
 
-        Base.metadata.bind = self.engine
-        Base.metadata.create_all()
-        DBSession = sessionmaker(bind=self.engine)
-        self.session = DBSession()
+        connect('telebot')
+
         # Init the logger
         self.logger = logging.getLogger('Telebot-Database')
         self.logger.setLevel(logging.DEBUG)
@@ -23,45 +19,45 @@ class dbHelper(object):
         self.createUser(update)
         new_message = Messages(
                 text=update.message.text,
-                sender=update.message.from_user.id,
-                chatId=update.message.chat_id,
+                from_user=update.message.from_user.id,
+                from_chat=update.message.chat_id,
                 date=update.message.date,
-                updateId= update.update_id)
-        self.session.add(new_message)
-        self.session.commit()
+                message_id=update.message.message_id,
+                update_id=update.update_id)
+        new_message.save()
 
     def createChat(self, update):
-        q = self.session.query(Chats).filter_by(id=update.message.chat_id).first()
-        if (q == None):
+        q = Chats.objects(chat_id__exists=update.message.chat_id)
+        print(q)
+        if (len(q) == 0):
             new_chat = Chats(
-                    id=update.message.chat_id,
+                    chat_id=update.message.chat_id,
                     title=update.message.chat.title,
                     type=update.message.chat.type,
                     date=update.message.date
             )
-            self.session.add(new_chat)
-            self.session.commit()
+            new_chat.save()
 
     def createUser(self, update):
-        q = self.session.query(Users).filter_by(id=update.message.from_user.id).first()
-        if q == None:
+        q = Users.objects(user_id=update.message.from_user.id)
+        if len(q) == 0:
             new_user = Users(
-                    id=update.message.from_user.id,
+                    user_id=update.message.from_user.id,
                     first_name=update.message.from_user.first_name,
                     last_name=update.message.from_user.last_name,
-
+                    username=update.message.from_user.username,
+                    chats = [update.message.chat_id]
             )
-            self.session.add(new_user)
-            self.session.commit()
+            new_user.save()
 
-    def count(self, update,args):
-        logging.log(0, args)
-        #TODO Define search optiosn and add more detail like message length
-        username = "hola"
-        customId = update.message.from_user.id
-        q = self.session.query(Messages).filter_by(chatId=update.message.chat_id,sender=customId)
-        count = q.count()
-        words = 0
-        for message in q:
-            words += len(message.text.split())
-        return (username, count, words)
+    def count(self, update, args):
+        userSearch = Users.objects(first_name__iexact=args,chats__contains=update.message.chat_id).only('user_id').first() # if len(args) > 0 else update.message.from_user.id
+        print("\n fuck \n fuck")
+        print(userSearch)
+        print (''.join(userSearch))
+        # messagesQ = Messages.objects()
+        # count = len(messagesQ)
+        # words = 0
+        # for message in q:
+        #   words += len(message.text.split())
+        return ("fuck", "fuck", "fuck")
