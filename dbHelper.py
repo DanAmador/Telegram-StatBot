@@ -1,4 +1,3 @@
-import json
 import logging
 
 from mongoengine import connect
@@ -24,7 +23,8 @@ class dbHelper(object):
                 from_chat=update.message.chat_id,
                 date=update.message.date,
                 message_id=update.message.message_id,
-                update_id=update.update_id)
+                update_id=update.update_id,
+                number_of_words=len(update.message.text.split()))
         new_message.save()
 
     def createChat(self, update):
@@ -66,22 +66,20 @@ class dbHelper(object):
 
         return username, len(messages), self.countWords(messages)
 
-
-
     def countWords(self, messages):
         totalWords = 0
         for message in messages:
-            totalWords += len(message.text.split())
+            totalWords += int(message.number_of_words)
         return totalWords
 
-    def minMaxStats(self, update):
-        users = Chats.objects(chat_id=update.message.chat_id).only('users').first()
-        allMessages = Messages.objects(from_chat=update.message.chat_id).only('text', 'from_user')
+    def minMaxStats(self, update, users_in_convversation):
+        allMessages = Messages.objects(from_chat=update.message.chat_id).only('text', 'from_user', 'number_of_words')
         totalMessages = float(len(allMessages))
         user_stats = []
         totalWords = 0
-        for user in users.users:
-            messages = Messages.objects(from_chat=update.message.chat_id, from_user=user).only('text', 'from_user')
+        for user in users_in_convversation:
+            messages = Messages.objects(from_chat=update.message.chat_id, from_user=user).only('text', 'from_user',
+                                                                                               'number_of_words')
             messagesPerUser = float(len(messages))
             wordsPerUser = self.countWords(messages)
             totalWords += wordsPerUser
@@ -90,7 +88,24 @@ class dbHelper(object):
                 'user': user,
                 'number_of_messages': messagesPerUser,
                 'conversation_percentage': "{0:.2f}".format((messagesPerUser / totalMessages) * 100),
-                'words': wordsPerUser
+                'number_of_words': wordsPerUser
             })
-
         return {'total_words': totalWords, 'total_messages': totalMessages, 'user_stats': user_stats}
+
+    def minMaxParse(self, update):
+        users = Chats.objects(chat_id=update.message.chat_id).only('users').first().users
+        user_stats_dict = self.minMaxStats(update, users)
+        user_stats = user_stats_dict['user_stats']
+        max_messages = max(user_stats, key=lambda x: x['number_of_messages'])
+        max_words = max(user_stats, key=lambda x: x['number_of_words'])
+
+        print("\n fuck \n fuck")
+        print(max_words)
+        return "Most messages sent:  %s with %d messages from a total of %d \nMost words used: %s with %d words from a total of %d" % (
+            self.getUserName(max_messages['user']), max_messages['number_of_messages'],user_stats_dict['total_messages'],
+            self.getUserName(max_words['user']), max_words['number_of_words'], user_stats_dict['total_words'])
+
+    def getUserName(self, id):
+        user_object = Users.objects(id=id).only('first_name', 'username').first()
+        return_string = user_object.username if user_object.username else user_object.first_name
+        return str(return_string)

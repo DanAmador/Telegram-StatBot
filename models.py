@@ -8,10 +8,11 @@ class Messages(Document):
     from_user = IntField(required=True)
     from_chat = IntField(required=True)
     text = StringField(max_length=4096, required=True)
+    number_of_words = IntField(required=True)
 
 
 class Users(Document):
-    id = IntField(primary_key=True, required=True)
+    id = IntField(primary_key=True, required=True,unique=True)
     first_name = StringField(max_length=30, required=True)
     last_name = StringField(max_length=30)
     username = StringField(max_length=30)
