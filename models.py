@@ -7,7 +7,6 @@ class Messages(Document):
     update_id = IntField(required=True)
     from_user = IntField(required=True)
     from_chat = IntField(required=True)
-    text = StringField(max_length=4096, required=True)
     number_of_words = IntField(required=True)
 
 
@@ -19,9 +18,14 @@ class Users(Document):
     chats = ListField(IntField())
 
 
+class Texts(Document):
+    id = IntField(primary_key=True, required=True,unique=True)
+    text = StringField(max_length=4096, required=True)
+    date = DateTimeField()
+
 class Chats(Document):
     chat_id = IntField(primary_key=True, required=True)
     type = StringField(max_length=30, required=True)
     title = StringField(max_length=40, required=True)
-    date = DateTimeField()
     users = ListField(IntField())
+    date = DateTimeField()

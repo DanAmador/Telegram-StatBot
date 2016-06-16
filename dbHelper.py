@@ -2,7 +2,7 @@ import logging
 
 from mongoengine import connect
 
-from models import Messages, Chats, Users
+from models import Messages, Chats, Users, Texts
 
 
 class dbHelper(object):
@@ -19,12 +19,16 @@ class dbHelper(object):
         self.createUser(update)
         new_message = Messages(
                 text=update.message.text,
+                date=update.message.date,
                 from_user=update.message.from_user.id,
                 from_chat=update.message.chat_id,
-                date=update.message.date,
                 message_id=update.message.message_id,
                 update_id=update.update_id,
                 number_of_words=len(update.message.text.split()))
+
+        new_text = Texts(text=update.message.text,
+                         date=update.message.date)
+        new_text.save()
         new_message.save()
 
     def createChat(self, update):
@@ -73,12 +77,12 @@ class dbHelper(object):
         return totalWords
 
     def minMaxStats(self, update, users_in_convversation):
-        allMessages = Messages.objects(from_chat=update.message.chat_id).only('text', 'from_user', 'number_of_words')
+        allMessages = Messages.objects(from_chat=update.message.chat_id).only('from_user', 'number_of_words')
         totalMessages = float(len(allMessages))
         user_stats = []
         totalWords = 0
         for user in users_in_convversation:
-            messages = Messages.objects(from_chat=update.message.chat_id, from_user=user).only('text', 'from_user',
+            messages = Messages.objects(from_chat=update.message.chat_id, from_user=user).only('from_user',
                                                                                                'number_of_words')
             messagesPerUser = float(len(messages))
             wordsPerUser = self.countWords(messages)
@@ -99,10 +103,9 @@ class dbHelper(object):
         max_messages = max(user_stats, key=lambda x: x['number_of_messages'])
         max_words = max(user_stats, key=lambda x: x['number_of_words'])
 
-        print("\n fuck \n fuck")
-        print(max_words)
         return "Most messages sent:  %s with %d messages from a total of %d \nMost words used: %s with %d words from a total of %d" % (
-            self.getUserName(max_messages['user']), max_messages['number_of_messages'],user_stats_dict['total_messages'],
+            self.getUserName(max_messages['user']), max_messages['number_of_messages'],
+            user_stats_dict['total_messages'],
             self.getUserName(max_words['user']), max_words['number_of_words'], user_stats_dict['total_words'])
 
     def getUserName(self, id):
