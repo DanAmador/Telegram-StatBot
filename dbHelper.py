@@ -1,5 +1,6 @@
 import logging
 
+from langdetect import detect
 from mongoengine import connect
 
 from models import Messages, Chats, Users, Texts
@@ -18,7 +19,6 @@ class dbHelper(object):
         self.createChat(update)
         self.createUser(update)
         new_message = Messages(
-                text=update.message.text,
                 date=update.message.date,
                 from_user=update.message.from_user.id,
                 from_chat=update.message.chat_id,
@@ -27,7 +27,8 @@ class dbHelper(object):
                 number_of_words=len(update.message.text.split()))
 
         new_text = Texts(text=update.message.text,
-                         date=update.message.date)
+                         date=update.message.date,
+                         language=detect(update.message.text))
         new_text.save()
         new_message.save()
 

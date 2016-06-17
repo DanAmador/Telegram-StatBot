@@ -19,9 +19,10 @@ class Users(Document):
 
 
 class Texts(Document):
-    id = IntField(primary_key=True, required=True,unique=True)
     text = StringField(max_length=4096, required=True)
     date = DateTimeField()
+    language = StringField(required=True,default='en')
+
 
 class Chats(Document):
     chat_id = IntField(primary_key=True, required=True)
