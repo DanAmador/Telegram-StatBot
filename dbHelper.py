@@ -8,7 +8,6 @@ from models import Messages, Chats, Users, Texts
 
 class dbHelper(object):
     def __init__(self):
-
         connect('telebot')
 
         # Init the logger
