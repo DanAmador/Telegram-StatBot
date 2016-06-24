@@ -138,5 +138,6 @@ class dbHelper(object):
 
     def getUserName(self, id):
         user_object = Users.objects(id=id).only('first_name', 'username').first()
-        return_string = user_object.username if user_object.username else user_object.first_name
-        return str(return_string)
+        username = user_object.username
+        first_name = user_object.first_name
+        return str(username) if username else str(first_name)
