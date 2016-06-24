@@ -8,6 +8,7 @@ db = dbHelper()
 
 
 def learn(bot, update):
+    # XXX: A lot of learning going on here
     bot.sendMessage(chat_id=update.message.chat_id, text="aww yiss")
 
 
@@ -46,6 +47,7 @@ def initialize():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     logger.debug("shit's working, yo %s" % data['telegram_token'])
+    # XXX: Sure you want that in your debug log?
 
     updater.start_polling()
     updater.idle()
