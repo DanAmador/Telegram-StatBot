@@ -45,7 +45,7 @@ def initialize():
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    logger.debug("shit's working,yo %s" % data['telegram_token'])
+    logger.debug("shit's working, yo %s" % data['telegram_token'])
 
     updater.start_polling()
     updater.idle()
