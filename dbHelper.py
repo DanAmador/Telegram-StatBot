@@ -71,15 +71,17 @@ class dbHelper(object):
             messages = Messages.objects(from_chat=msg.chat.id)
             username = msg.chat.title
         else:
-            userSearch = Users.objects(
-                first_name__iexact=' '.join(args),
-                chats__contains=msg.chat_id
-            ).only('id', 'username', 'first_name')\
-             .first() if len(args) > 0 else update.message.from_user
-            username = userSearch.username if userSearch.username else userSearch.first_name
-            messages = Messages.objects(from_user=userSearch.id).only('text')
+            if len(args):
+                user = Users.objects(
+                    first_name__iexact=' '.join(args),
+                    chats__contains=msg.chat_id
+                ).only('id', 'username', 'first_name').first()
+            else:
+                msg.from_user
+            username = user.username if user.username else user.first_name
+            messages = Messages.objects(from_user=user.id).only('text')
 
-        return username, len(messages), self.countWords(messages)
+        return username, len(messages), self.count_words(messages)
 
     def count_words(self, messages):
         totalWords = 0
