@@ -89,7 +89,7 @@ class dbHelper(object):
             totalWords += int(message.number_of_words)
         return totalWords
 
-    def min_max_stats(self, update, users_in_conversation):
+    def get_chat_stats(self, update, users_in_conversation):
         msg = update.message
         all_messages = Messages.objects(
             from_chat=msg.chat_id
@@ -119,9 +119,9 @@ class dbHelper(object):
             'user_stats': user_stats
         }
 
-    def min_max_parse(self, update):
+    def parse_chat_stats(self, update):
         users = Chats.objects(chat_id=update.message.chat_id).only('users').first().users
-        user_stats_dict = self.min_max_stats(update, users)
+        user_stats_dict = self.get_chat_stats(update, users)
         user_stats = user_stats_dict['user_stats']
         max_messages = max(user_stats, key=lambda x: x['number_of_messages'])
         max_words = max(user_stats, key=lambda x: x['number_of_words'])

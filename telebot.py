@@ -28,7 +28,7 @@ def count(bot, update, args):
 
 
 def overall(bot, update):
-    stats = db.min_max_parse(update)
+    stats = db.parse_chat_stats(update)
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 
