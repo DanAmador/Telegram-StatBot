@@ -12,7 +12,7 @@ def learn(bot, update):
 
 
 def updates(bot, update):
-    db.messageInsert(update)
+    db.insert_message(update)
 
 
 def count(bot, update, args):
@@ -27,7 +27,7 @@ def count(bot, update, args):
 
 
 def overall(bot, update):
-    stats = db.minMaxParse(update)
+    stats = db.min_max_parse(update)
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 

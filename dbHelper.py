@@ -15,9 +15,9 @@ class dbHelper(object):
         self.logger = logging.getLogger('Telebot-Database')
         self.logger.setLevel(logging.DEBUG)
 
-    def messageInsert(self, update):
-        self.createChat(update)
-        self.createUser(update)
+    def insert_message(self, update):
+        self.create_chat(update)
+        self.create_user(update)
 
         msg = update.message
         new_message = Messages(
@@ -36,7 +36,7 @@ class dbHelper(object):
         new_text.save()
         new_message.save()
 
-    def createChat(self, update):
+    def create_chat(self, update):
         msg = update.message
         q = Chats.objects(chat_id=msg.chat_id)
         if not q:
@@ -50,7 +50,7 @@ class dbHelper(object):
         else:
             q.update(add_to_set__users=update.message.from_user.id)
 
-    def createUser(self, update):
+    def create_user(self, update):
         msg = update.message
         q = Users.objects(id=msg.from_user.id)
         if not q:
@@ -81,45 +81,45 @@ class dbHelper(object):
 
         return username, len(messages), self.countWords(messages)
 
-    def countWords(self, messages):
+    def count_words(self, messages):
         totalWords = 0
         for message in messages:
             totalWords += int(message.number_of_words)
         return totalWords
 
-    def minMaxStats(self, update, users_in_conversation):
+    def min_max_stats(self, update, users_in_conversation):
         msg = update.message
-        allMessages = Messages.objects(
+        all_messages = Messages.objects(
             from_chat=msg.chat_id
         ).only('from_user', 'number_of_words')
-        totalMessages = float(len(allMessages))
+        total_messages = float(len(all_messages))
         user_stats = []
-        totalWords = 0
+        total_words = 0
         for user in users_in_conversation:
             messages = Messages.objects(
                 from_chat=msg.chat_id,
                 from_user=user
             ).only('from_user', 'number_of_words')
-            messagesPerUser = float(len(messages))
-            wordsPerUser = self.countWords(messages)
-            totalWords += wordsPerUser
-            conv_percentage = (messagesPerUser / totalMessages) * 100
+            messages_per_user = float(len(messages))
+            words_per_user = self.count_words(messages)
+            total_words += words_per_user
+            conv_percentage = (messages_per_user / total_messages) * 100
 
             user_stats.append({
                 'user': user,
-                'number_of_messages': messagesPerUser,
+                'number_of_messages': messages_per_user,
                 'conversation_percentage': "{0:.2f}".format(conv_percentage),
-                'number_of_words': wordsPerUser
+                'number_of_words': words_per_user
             })
         return {
-            'total_words': totalWords,
-            'total_messages': totalMessages,
+            'total_words': total_words,
+            'total_messages': total_messages,
             'user_stats': user_stats
         }
 
-    def minMaxParse(self, update):
+    def min_max_parse(self, update):
         users = Chats.objects(chat_id=update.message.chat_id).only('users').first().users
-        user_stats_dict = self.minMaxStats(update, users)
+        user_stats_dict = self.min_max_stats(update, users)
         user_stats = user_stats_dict['user_stats']
         max_messages = max(user_stats, key=lambda x: x['number_of_messages'])
         max_words = max(user_stats, key=lambda x: x['number_of_words'])
@@ -128,15 +128,15 @@ class dbHelper(object):
                         "from a total of {total_words}")
 
         return msg_template.format(
-            user=self.getUserName(max_messages['user']),
+            user=self.get_user_name(max_messages['user']),
             user_msg=max_messages['number_of_messages'],
             total_msg=user_stats_dict['total_messages'],
-            user_maxw=self.getUserName(max_words['user']),
+            user_maxw=self.get_user_name(max_words['user']),
             user_words=max_words['number_of_words'],
             total_words=user_stats_dict['total_words']
         )
 
-    def getUserName(self, id):
+    def get_user_name(self, id):
         user_object = Users.objects(id=id).only('first_name', 'username').first()
         username = user_object.username
         first_name = user_object.first_name
