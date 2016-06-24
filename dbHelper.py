@@ -39,7 +39,7 @@ class dbHelper(object):
     def createChat(self, update):
         msg = update.message
         q = Chats.objects(chat_id=msg.chat_id)
-        if (len(q) == 0):
+        if not q:
             new_chat = Chats(
                 chat_id=msg.chat_id,
                 title=msg.chat.title,
@@ -53,7 +53,7 @@ class dbHelper(object):
     def createUser(self, update):
         msg = update.message
         q = Users.objects(id=msg.from_user.id)
-        if len(q) == 0:
+        if not q:
             new_user = Users(
                 id=msg.from_user.id,
                 first_name=msg.from_user.first_name,
@@ -67,7 +67,7 @@ class dbHelper(object):
 
     def count(self, update, args):
         msg = update.message
-        if args[0] == 'all':
+        if args[0] is 'all':
             messages = Messages.objects(from_chat=msg.chat.id)
             username = msg.chat.title
         else:
