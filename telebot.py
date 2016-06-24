@@ -35,8 +35,8 @@ def overall(bot, update):
 def initialize():
     logging.basicConfig(level=logging.DEBUG)
     with open('settings.json') as settings:
-        data = json.load(settings)
-        updater = Updater(token=data["telegram_token"])
+        token = json.load(settings).get("telegram_token")
+        updater = Updater(token=token)
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('learn', learn))
@@ -46,8 +46,8 @@ def initialize():
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    logger.debug("shit's working, yo %s" % data['telegram_token'])
     # XXX: Sure you want that in your debug log?
+    logger.debug("shit's working, yo %s" % token)
 
     updater.start_polling()
     updater.idle()
