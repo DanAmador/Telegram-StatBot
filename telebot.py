@@ -17,8 +17,12 @@ def updates(bot, update):
 
 def count(bot, update, args):
     username, messages, words = db.count(update, args)
-    sentMessage = "%s has sent  %s messages in this chat with a total of %s words" if args[0] != 'all' else "The chat %s has a total of %s messages with %s words"
-    results = sentMessage % (username, messages, words)
+    if args[0] is not 'all':
+        sent_message = "%s has sent  %s messages in this chat with a total of %s words"
+    else:
+        sent_message = "The chat %s has a total of %s messages with %s words"
+
+    results = sent_message % (username, messages, words)
     bot.sendMessage(chat_id=update.message.chat_id, text=results)
 
 
