@@ -11,7 +11,7 @@ class Messages(Document):
 
 
 class Users(Document):
-    id = IntField(primary_key=True, required=True,unique=True)
+    id = IntField(primary_key=True, required=True, unique=True)
     first_name = StringField(max_length=30, required=True)
     last_name = StringField(max_length=30)
     username = StringField(max_length=30)
@@ -21,7 +21,7 @@ class Users(Document):
 class Texts(Document):
     text = StringField(max_length=4096, required=True)
     date = DateTimeField()
-    language = StringField(required=True,default='en')
+    language = StringField(required=True, default='en')
 
 
 class Chats(Document):
