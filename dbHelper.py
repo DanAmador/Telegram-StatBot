@@ -18,55 +18,62 @@ class dbHelper(object):
     def messageInsert(self, update):
         self.createChat(update)
         self.createUser(update)
-        new_message = Messages(
-            date=update.message.date,
-            from_user=update.message.from_user.id,
-            from_chat=update.message.chat_id,
-            message_id=update.message.message_id,
-            update_id=update.update_id,
-            number_of_words=len(update.message.text.split()))
 
-        new_text = Texts(text=update.message.text,
-                         date=update.message.date,
-                         language=detect(update.message.text))
+        msg = update.message
+        new_message = Messages(
+            date=msg.date,
+            from_user=msg.from_user.id,
+            from_chat=msg.chat_id,
+            message_id=msg.message_id,
+            update_id=update.update_id,
+            number_of_words=len(msg.text.split())
+        )
+        new_text = Texts(
+            text=msg.text,
+            date=msg.date,
+            language=detect(msg.text)
+        )
         new_text.save()
         new_message.save()
 
     def createChat(self, update):
-        q = Chats.objects(chat_id=update.message.chat_id)
+        msg = update.message
+        q = Chats.objects(chat_id=msg.chat_id)
         if (len(q) == 0):
             new_chat = Chats(
-                chat_id=update.message.chat_id,
-                title=update.message.chat.title,
-                type=update.message.chat.type,
-                date=update.message.date
+                chat_id=msg.chat_id,
+                title=msg.chat.title,
+                type=msg.chat.type,
+                date=msg.date
             )
             new_chat.save()
         else:
             q.update(add_to_set__users=update.message.from_user.id)
 
     def createUser(self, update):
-        q = Users.objects(id=update.message.from_user.id)
+        msg = update.message
+        q = Users.objects(id=msg.from_user.id)
         if len(q) == 0:
             new_user = Users(
-                id=update.message.from_user.id,
-                first_name=update.message.from_user.first_name,
-                last_name=update.message.from_user.last_name,
-                username=update.message.from_user.username,
-                chats=[update.message.chat_id]
+                id=msg.from_user.id,
+                first_name=msg.from_user.first_name,
+                last_name=msg.from_user.last_name,
+                username=msg.from_user.username,
+                chats=[msg.chat_id]
             )
             new_user.save()
         else:
             q.update(add_to_set__chats=update.message.chat_id)
 
     def count(self, update, args):
+        msg = update.message
         if args[0] == 'all':
-            messages = Messages.objects(from_chat=update.message.chat.id)
-            username = update.message.chat.title
+            messages = Messages.objects(from_chat=msg.chat.id)
+            username = msg.chat.title
         else:
             userSearch = Users.objects(
                 first_name__iexact=' '.join(args),
-                chats__contains=update.message.chat_id
+                chats__contains=msg.chat_id
             ).only('id', 'username', 'first_name')\
              .first() if len(args) > 0 else update.message.from_user
             username = userSearch.username if userSearch.username else userSearch.first_name
@@ -81,15 +88,16 @@ class dbHelper(object):
         return totalWords
 
     def minMaxStats(self, update, users_in_convversation):
+        msg = update.message
         allMessages = Messages.objects(
-            from_chat=update.message.chat_id
+            from_chat=msg.chat_id
         ).only('from_user', 'number_of_words')
         totalMessages = float(len(allMessages))
         user_stats = []
         totalWords = 0
         for user in users_in_convversation:
             messages = Messages.objects(
-                from_chat=update.message.chat_id,
+                from_chat=msg.chat_id,
                 from_user=user
             ).only('from_user', 'number_of_words')
             messagesPerUser = float(len(messages))
