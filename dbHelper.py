@@ -87,7 +87,7 @@ class dbHelper(object):
             totalWords += int(message.number_of_words)
         return totalWords
 
-    def minMaxStats(self, update, users_in_convversation):
+    def minMaxStats(self, update, users_in_conversation):
         msg = update.message
         allMessages = Messages.objects(
             from_chat=msg.chat_id
@@ -95,7 +95,7 @@ class dbHelper(object):
         totalMessages = float(len(allMessages))
         user_stats = []
         totalWords = 0
-        for user in users_in_convversation:
+        for user in users_in_conversation:
             messages = Messages.objects(
                 from_chat=msg.chat_id,
                 from_user=user
