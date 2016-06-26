@@ -46,9 +46,6 @@ def initialize():
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    # XXX: Sure you want that in your debug log?
-    logger.debug("shit's working, yo %s" % token)
-
     updater.start_polling()
     updater.idle()
 
