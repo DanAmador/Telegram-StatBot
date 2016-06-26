@@ -1,0 +1,3 @@
+[submodule "char-rnn"]
+	path = char-rnn
+	url = https://github.com/karpathy/char-rnn.git
