@@ -1,37 +1,32 @@
-from sqlalchemy import Column, ForeignKey, String, Integer, Date, Table
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-
-Base = declarative_base()
-
-class Messages(Base):
-    __tablename__ = 'messages'
-    id = Column(Integer, primary_key=True)
-    text = Column(String(4096), nullable=False)
-    date = Column(Date)
-    updateId = Column(String(16), nullable=False)
-
-    sender = Column(Integer, ForeignKey('users.id'))
-    chatId = Column(Integer, ForeignKey('chats.id'))
+from mongoengine import *
 
 
-
-class Users(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String(30), nullable=False)
-    last_name = Column(String(30), nullable=True)
-
-    # chatIds = Column(Integer, ForeignKey('chats.id'))
-
+class Messages(Document):
+    date = DateTimeField()
+    message_id = IntField(primary_key=True, required=True, unique=True)
+    update_id = IntField(required=True)
+    from_user = IntField(required=True)
+    from_chat = IntField(required=True)
+    number_of_words = IntField(required=True)
 
 
+class Users(Document):
+    id = IntField(primary_key=True, required=True, unique=True)
+    first_name = StringField(max_length=30, required=True)
+    last_name = StringField(max_length=30)
+    username = StringField(max_length=30)
+    chats = ListField(IntField())
 
-class Chats(Base):
-    __tablename__ = 'chats'
-    id = Column(Integer, primary_key=True)
-    type = Column(String(40), nullable=True)
-    title = Column(String(40), nullable=False)
-    date = Column(Date)
 
-    messages = relationship(Messages)
+class Texts(Document):
+    text = StringField(max_length=4096, required=True)
+    date = DateTimeField()
+    language = StringField(required=True, default='en')
+
+
+class Chats(Document):
+    chat_id = IntField(primary_key=True, required=True)
+    type = StringField(max_length=30, required=True)
+    title = StringField(max_length=40, required=True)
+    users = ListField(IntField())
+    date = DateTimeField()

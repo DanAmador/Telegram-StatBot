@@ -1,3 +1,4 @@
-SQLAlchemy == 1.0.13
+mongoengine == 0.10.6
+telegram == 0.0.1
+langdetect == 1.0.6
 python_telegram_bot == 4.2.0
-
