@@ -1,15 +1,29 @@
 #!/usr/bin/env python3
 import json
 import logging
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
 from dbHelper import dbHelper
 
 db = dbHelper()
 
 
-def learn(bot, update):
-    # XXX: A lot of learning going on here
-    bot.sendMessage(chat_id=update.message.chat_id, text="aww yiss")
+def languages_count():
+    formatted_string = ""
+    current_languages_count = dbHelper.get_current_languages()
+    for language, times in current_languages_count.iteritems():
+        formatted_string += "\n%s:\t\t%d" % (language, times)
+    return formatted_string
+
+
+def learn(bot, update, args):
+    if len(args) is 0:
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text="You forgot to add the language, the available languages are.. %s " % languages_count())
+    else:
+        #TODO update with DB dump depending on language chosen
+        bot.sendMessage(chat_id=update.message.chat_id, text="aww yiss")
 
 
 def updates(bot, update):
@@ -39,7 +53,7 @@ def initialize():
         updater = Updater(token=token)
 
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler('learn', learn))
+    dispatcher.add_handler(CommandHandler('learn', learn, pass_args=True))
     dispatcher.add_handler(CommandHandler('chatstats', count, pass_args=True))
     dispatcher.add_handler(CommandHandler('overall', overall))
     dispatcher.add_handler(MessageHandler([Filters.text], updates))
