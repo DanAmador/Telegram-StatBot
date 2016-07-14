@@ -22,6 +22,7 @@ class Texts(Document):
     text = StringField(max_length=4096, required=True)
     date = DateTimeField()
     language = StringField(required=True, default='en')
+    indexed = BooleanField(default=False)
 
 
 class Chats(Document):

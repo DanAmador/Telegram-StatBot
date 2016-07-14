@@ -4,26 +4,37 @@ import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from dbHelper import dbHelper
+from dbHelper import Dbhelper
 
-db = dbHelper()
+db = Dbhelper()
 
 
 def languages_count():
     formatted_string = ""
-    current_languages_count = dbHelper.get_current_languages()
+    current_languages_count = Dbhelper.get_languages_message_count()
     for language, times in current_languages_count.iteritems():
         formatted_string += "\n%s:\t\t%d" % (language, times)
     return formatted_string
 
 
-def learn(bot, update, args):
+def index(bot, update, args):
     if len(args) is 0:
-        bot.sendMessage(chat_id=update.message.chat_id,
-                        text="You forgot to add the language, the available languages are.. %s " % languages_count())
+        from models import Texts
+        available_languages = Texts.objects().only('language').distinct('language')
+        for language in available_languages:
+            print(language)
+            db.index_messages_by_language(language)
+
+       # bot.sendMessage(chat_id=update.message.chat_id,
+    #                text="You forgot to add the language, the available languages are.. %s " % languages_count())
+
     else:
+        language_chosen = args[0]
+        logging.info(args)
+
         #TODO update with DB dump depending on language chosen
-        bot.sendMessage(chat_id=update.message.chat_id, text="aww yiss")
+        db.index_messages_by_language(language_chosen)
+        bot.sendMessage(chat_id=update.message.chat_id, text="Messages indexed")
 
 
 def updates(bot, update):
@@ -46,6 +57,10 @@ def overall(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 
+def learn(bot,update):
+    pass
+
+
 def initialize():
     logging.basicConfig(level=logging.DEBUG)
     with open('settings.json') as settings:
@@ -54,6 +69,7 @@ def initialize():
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('learn', learn, pass_args=True))
+    dispatcher.add_handler(CommandHandler('index', index, pass_args=True))
     dispatcher.add_handler(CommandHandler('chatstats', count, pass_args=True))
     dispatcher.add_handler(CommandHandler('overall', overall))
     dispatcher.add_handler(MessageHandler([Filters.text], updates))

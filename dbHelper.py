@@ -1,4 +1,5 @@
 import logging
+import os
 
 from langdetect import detect
 from mongoengine import connect
@@ -6,7 +7,7 @@ from mongoengine import connect
 from models import Messages, Chats, Users, Texts
 
 
-class dbHelper(object):
+class Dbhelper(object):
     def __init__(self):
         connect('telebot')
 
@@ -147,9 +148,24 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
         return str(username) if username else str(first_name)
 
     @staticmethod
-    def get_current_languages():
+    def get_languages_message_count():
         languages = Texts.objects().only('language').distinct('language')
         count = {}
         for language in languages:
             count[language] = Texts.objects(language=language).count()
         return count
+
+    @staticmethod
+    def index_messages_by_language(language, indexed=False):
+        texts_by_language = Texts.objects(language=language, indexed=indexed)
+        message_2_index = ''
+        for message in texts_by_language:
+            message_2_index += "%s\n" % message.text
+            message.update(indexed=True)
+        try:
+            os.makedirs('./messages')
+        except OSError:
+            pass
+        with open('./messages/%s.txt' % language, 'w+') as messages_text:
+            messages_text.write(message_2_index)
+        return texts_by_language
