@@ -1,14 +1,14 @@
 import logging
 import os
 
-from langdetect import detect
+from langdetect import DetectorFactory, detect
 from mongoengine import connect
-
 from models import Messages, Chats, Users, Texts
 
 
 class Dbhelper(object):
     def __init__(self):
+        DetectorFactory.seed = 0
         connect('telebot')
 
         # Init the logger
