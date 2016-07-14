@@ -6,10 +6,11 @@ from mongoengine import connect
 
 from models import Messages, Chats, Users, Texts
 
+DetectorFactory.seed = 0
+
 
 class Dbhelper(object):
     def __init__(self):
-        DetectorFactory.seed = 0
         connect('telebot')
 
         # Init the logger
@@ -27,7 +28,8 @@ class Dbhelper(object):
                 from_chat=msg.chat_id,
                 message_id=msg.message_id,
                 update_id=update.update_id,
-                number_of_words=len(msg.text.split())
+                number_of_words=len(msg.text.split()),
+                language=detect(msg.text)
         )
         new_text = Texts(
                 text=msg.text,
@@ -163,6 +165,6 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
             os.makedirs('./messages')
         except OSError:
             pass
-        with open('./messages/%s.txt' % language, 'w+') as messages_text:
+        with open('./messages/%s.txt' % language, 'a+') as messages_text:
             messages_text.write(message_2_index)
         return texts_by_language

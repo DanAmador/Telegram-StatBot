@@ -22,8 +22,7 @@ def index(bot, update, args):
         from models import Texts
         available_languages = Texts.objects().only('language').distinct('language')
         for language in available_languages:
-            print(language)
-            db.index_messages_by_language(language)
+            db.index_messages_by_language(language,True)
 
             # bot.sendMessage(chat_id=update.message.chat_id,
     # text="You forgot to add the language, the available languages are.. %s " % languages_count())
@@ -32,7 +31,6 @@ def index(bot, update, args):
         language_chosen = args[0]
         logging.info(args)
 
-        # TODO update with DB dump depending on language chosen
         db.index_messages_by_language(language_chosen)
         bot.sendMessage(chat_id=update.message.chat_id, text="Messages indexed")
 

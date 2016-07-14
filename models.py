@@ -8,6 +8,7 @@ class Messages(Document):
     from_user = IntField(required=True)
     from_chat = IntField(required=True)
     number_of_words = IntField(required=True)
+    language = StringField(required=True,default='en')
 
 
 class Users(Document):
