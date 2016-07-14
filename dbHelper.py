@@ -3,6 +3,7 @@ import os
 
 from langdetect import DetectorFactory, detect
 from mongoengine import connect
+
 from models import Messages, Chats, Users, Texts
 
 
@@ -68,20 +69,16 @@ class Dbhelper(object):
             q.update(add_to_set__chats=update.message.chat_id)
 
     def count(self, update, args):
+        print(args)
         msg = update.message
-        if args[0] is 'all':
+        if len(args) == 0:
             messages = Messages.objects(from_chat=msg.chat.id)
             username = msg.chat.title
         else:
-            if len(args):
-                user = Users.objects(
-                        first_name__iexact=' '.join(args),
-                        chats__contains=msg.chat_id
-                ).only('id', 'username', 'first_name').first()
-            else:
-                msg.from_user
+
+            user = Users.objects(first_name__iexact=' '.join(args), chats__contains=msg.chat_id).first()
             username = user.username if user.username else user.first_name
-            messages = Messages.objects(from_user=user.id).only('text')
+            messages = Messages.objects(from_user=user.id).only('number_of_words')
 
         return username, len(messages), self.count_words(messages)
 
@@ -152,7 +149,7 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
         languages = Texts.objects().only('language').distinct('language')
         count = {}
         for language in languages:
-            count[language] = Texts.objects(language=language).count()
+            count[language] = len(Texts.objects(language=language))
         return count
 
     @staticmethod

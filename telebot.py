@@ -25,14 +25,14 @@ def index(bot, update, args):
             print(language)
             db.index_messages_by_language(language)
 
-       # bot.sendMessage(chat_id=update.message.chat_id,
-    #                text="You forgot to add the language, the available languages are.. %s " % languages_count())
+            # bot.sendMessage(chat_id=update.message.chat_id,
+    # text="You forgot to add the language, the available languages are.. %s " % languages_count())
 
     else:
         language_chosen = args[0]
         logging.info(args)
 
-        #TODO update with DB dump depending on language chosen
+        # TODO update with DB dump depending on language chosen
         db.index_messages_by_language(language_chosen)
         bot.sendMessage(chat_id=update.message.chat_id, text="Messages indexed")
 
@@ -43,10 +43,9 @@ def updates(bot, update):
 
 def count(bot, update, args):
     username, messages, words = db.count(update, args)
-    if args[0] is not 'all':
-        sent_message = "%s has sent  %s messages in this chat with a total of %s words"
-    else:
-        sent_message = "The chat %s has a total of %s messages with %s words"
+
+    sent_message = "%s has sent  %s messages in this chat with a total of %s words" if len(
+        args) > 0 else "The chat %s has a total of %s messages with %s words"
 
     results = sent_message % (username, messages, words)
     bot.sendMessage(chat_id=update.message.chat_id, text=results)
@@ -57,7 +56,7 @@ def overall(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 
-def learn(bot,update):
+def learn(bot, update):
     pass
 
 
@@ -70,7 +69,7 @@ def initialize():
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('learn', learn, pass_args=True))
     dispatcher.add_handler(CommandHandler('index', index, pass_args=True))
-    dispatcher.add_handler(CommandHandler('chatstats', count, pass_args=True))
+    dispatcher.add_handler(CommandHandler('stats', count, pass_args=True))
     dispatcher.add_handler(CommandHandler('overall', overall))
     dispatcher.add_handler(MessageHandler([Filters.text], updates))
 
