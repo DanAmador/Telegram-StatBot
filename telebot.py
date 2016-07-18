@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 import json
 import logging
+import subprocess
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from dbHelper import Dbhelper
+from min_char import min_char
 
 db = Dbhelper()
+
+
+def file_len(fname):
+    p = subprocess.Popen(['wc', '-l', './messages/%s.txt' % fname], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    result, err = p.communicate()
+    if p.returncode != 0:
+        raise IOError(err)
+    return int(result.strip().split()[0])
 
 
 def languages_count():
@@ -50,15 +61,36 @@ def overall(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 
-def learn(bot, update,args):
-    if len(args) > 1:
-        bot.sendMessage(chat_id=update.message.chat_id, text="Forgot to add which language to learn")
+def enlist_languages(language_map):
+    languages = ''
+    count = 0
+    for value in sorted(language_map.items(), key=lambda x: x[1], reverse=True):
+        if count < 10:
+            languages += '%s: %s\n' % (value[0], value[1])
+        count += 1
+    return languages
+
+
+def learn(bot, update, args):
+    message = ''
+    if len(args) < 1:
+        message = "Forgot to add which language to learn \nAvailable languages with message total:\n%s" % enlist_languages(
+                Dbhelper.get_languages_message_count())
     else:
-        # TODO LEARN SUM SHIT
-        pass
-
-
-
+        num_of_messages = file_len(args[0])
+        try:
+            if num_of_messages < 3000:
+                raise ValueError
+            ml_obj = min_char(args[0], args[1])
+            message = ml_obj.learn()
+        except ValueError:
+            message = 'At least 3000 messages are needed, %s chat has %d messages.' % (args[0],num_of_messages)
+        except IndexError:
+            ml_obj = min_char(args[0], 5000)
+            message = ml_obj.learn()
+        except IOError:
+            message = 'File for the language %s does not exist' % args[0]
+    bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 
 def initialize():

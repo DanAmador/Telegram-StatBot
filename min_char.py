@@ -7,7 +7,7 @@ import numpy as np
 
 class min_char():
     # data I/O
-    def __init__(self, language, limit=50000):
+    def __init__(self, language, limit):
         self.limit = limit
         language = 'messages/' + language if language is not 'example' else language
         self.data = open('%s.txt' % language, 'r').read()  # should be simple plain text file
@@ -119,7 +119,7 @@ class min_char():
             print(n)
         return txt
 
-
-if __name__ == '__main__':
-    min_char = min_char(language='example')
-    print(min_char.learn())
+#
+# if __name__ == '__main__':
+#     min_char = min_char(language='en')
+#     print(min_char.learn())
