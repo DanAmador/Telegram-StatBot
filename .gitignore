@@ -30,7 +30,7 @@
 
 ## File-based project format:
 *.ipr
-/messages
+/messages/*.txt
 *.iws
 
 ## Plugin-specific files:

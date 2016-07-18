@@ -147,8 +147,9 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
         return str(username) if username else str(first_name)
 
     @staticmethod
-    def get_languages_message_count():
-        languages = Texts.objects().only('language').distinct('language')
+    def get_languages_message_count(language_to_search=None):
+        languages = Texts.objects().only('language').distinct(
+            'language') if language_to_search is None else Texts.objects(language=language_to_search).only('language')
         count = {}
         for language in languages:
             count[language] = len(Texts.objects(language=language))

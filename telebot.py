@@ -22,11 +22,7 @@ def index(bot, update, args):
         from models import Texts
         available_languages = Texts.objects().only('language').distinct('language')
         for language in available_languages:
-            db.index_messages_by_language(language,True)
-
-            # bot.sendMessage(chat_id=update.message.chat_id,
-    # text="You forgot to add the language, the available languages are.. %s " % languages_count())
-
+            db.index_messages_by_language(language, True)
     else:
         language_chosen = args[0]
         logging.info(args)
@@ -43,7 +39,7 @@ def count(bot, update, args):
     username, messages, words = db.count(update, args)
 
     sent_message = "%s has sent  %s messages in this chat with a total of %s words" if len(
-        args) > 0 else "The chat %s has a total of %s messages with %s words"
+            args) > 0 else "The chat %s has a total of %s messages with %s words"
 
     results = sent_message % (username, messages, words)
     bot.sendMessage(chat_id=update.message.chat_id, text=results)
@@ -54,8 +50,15 @@ def overall(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=stats)
 
 
-def learn(bot, update):
-    pass
+def learn(bot, update,args):
+    if len(args) > 1:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Forgot to add which language to learn")
+    else:
+        # TODO LEARN SUM SHIT
+        pass
+
+
+
 
 
 def initialize():
