@@ -4,6 +4,7 @@ import os
 from langdetect import DetectorFactory, detect
 from mongoengine import connect
 
+from common import form_list
 from models import Messages, Chats, Users, Texts
 
 DetectorFactory.seed = 0
@@ -71,18 +72,16 @@ class Dbhelper(object):
             q.update(add_to_set__chats=update.message.chat_id)
 
     def count(self, update, args):
-        print(args)
         msg = update.message
         if len(args) == 0:
             messages = Messages.objects(from_chat=msg.chat.id)
             username = msg.chat.title
         else:
-
             user = Users.objects(first_name__iexact=' '.join(args), chats__contains=msg.chat_id).first()
             username = user.username if user.username else user.first_name
             messages = Messages.objects(from_user=user.id).only('number_of_words')
 
-        return username, len(messages), self.count_words(messages)
+        return username, messages.count(), self.count_words(messages)
 
     @staticmethod
     def count_words(messages):
@@ -93,10 +92,8 @@ class Dbhelper(object):
 
     def get_chat_stats(self, update, users_in_conversation):
         msg = update.message
-        all_messages = Messages.objects(
-                from_chat=msg.chat_id
-        ).only('from_user', 'number_of_words')
-        total_messages = float(len(all_messages))
+        all_messages = Messages.objects(from_chat=msg.chat_id).only('from_user', 'number_of_words')
+        total_messages = all_messages.count()
         user_stats = []
         total_words = 0
         for user in users_in_conversation:
@@ -104,7 +101,7 @@ class Dbhelper(object):
                     from_chat=msg.chat_id,
                     from_user=user
             ).only('from_user', 'number_of_words')
-            messages_per_user = float(len(messages))
+            messages_per_user = messages.count()
             words_per_user = self.count_words(messages)
             total_words += words_per_user
             conv_percentage = (messages_per_user / total_messages) * 100
@@ -149,10 +146,11 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
     @staticmethod
     def get_languages_message_count(language_to_search=None):
         languages = Texts.objects().only('language').distinct(
-            'language') if language_to_search is None else Texts.objects(language=language_to_search).only('language')
+                'language') if language_to_search is None else Texts.objects(language=language_to_search).only(
+                'language')
         count = {}
         for language in languages:
-            count[language] = len(Texts.objects(language=language))
+            count[language] = Texts.objects(language=language).count()
         return count
 
     @staticmethod
@@ -169,3 +167,13 @@ Most words used: {user_maxw} with {user_words} words from a total of {total_word
         with open('./messages/%s.txt' % language, 'a+') as messages_text:
             messages_text.write(message_2_index)
         return texts_by_language
+
+    def top_messagers_in_chat(self, chat_id, top_num):
+        users_in_chat = Users.objects(chats__contains=chat_id).only('id')
+        user_ids = map(lambda n: n.id, users_in_chat)
+
+        count_dict = {}
+        for user_id in user_ids:
+            count_dict[self.get_user_name(user_id)] = Messages.objects(from_chat=chat_id, from_user=user_id).count()
+
+        return form_list(count_dict,top_num)
